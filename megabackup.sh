@@ -74,7 +74,7 @@ if [ $DAY = "01" -o $DAY = "15" ]; then
 	# if the backup file was created successfully, keep the last two full backups and remove everything else
 	if [ -f "$FILEBACKUP" ]
 	then
-		ls -td $DESTINATION/Backup-DIFF* | xargs rm -f
+		ls -td $DESTINATION/Backup-DIFF* | tail -n +8 | xargs rm -f
 		ls -td $DESTINATION/Backup-FULL* | tail -n +3 | xargs rm -f
 	fi
 else
