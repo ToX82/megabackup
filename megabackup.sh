@@ -50,7 +50,7 @@ fi
 
 # let's do the backup
 for db in $DATABASES; do
-	mysqldump --force --opt --user="$DB_USER" --password="$DB_PASS" --databases $db | gzip > "000_database_dumps/$db.sql.gz"
+	mysqldump --force --opt --user="$DB_USER" --password="$DB_PASS" --databases $db > "000_database_dumps/$db.sql"
 done
 
 
