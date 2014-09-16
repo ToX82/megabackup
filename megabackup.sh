@@ -37,7 +37,9 @@ then
 	mkdir 000_database_dumps
 fi
 
-# grab a list of specified databses, or get them all
+# if a $ORIGIN/00_databases.txt exists, grab the list of specified databases you want to backup, otherwise get them all
+# 00_databases.txt content is just a list of database names, separated by a space
+# e.g. database1 mywebsite otherdb
 if [ -f 00_databases.txt ]
 then
 	mapfile DATABASES < 00_databases.txt
@@ -45,7 +47,7 @@ else
 	DATABASES=`mysql --user="$DB_USER" --password="$DB_PASS" -e "SHOW DATABASES;" | grep -Ev "(Database|test|phpmyadmin|mysql|performance_schema|information_schema)"`
 fi
 
-# let's do database backups!
+# let's do the backup
 for db in $DATABASES; do
 	mysqldump --force --opt --user="$DB_USER" --password="$DB_PASS" --databases $db | gzip > "000_database_dumps/$db.sql.gz"
 done
