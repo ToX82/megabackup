@@ -1,11 +1,11 @@
 megabackup
 ==========
 
-A simple BASH script useful to backup mySQL databases and files
+A simple BASH script useful to backup mySQL databases and files.
 
-Based upon an idea found here: [Ubuntu-it forum](http://forum.ubuntu-it.org/viewtopic.php?p=3284474#p3284474)
+Based upon an idea found here: [Ubuntu-it forum](http://forum.ubuntu-it.org/viewtopic.php?p=3284474#p3284474).
 
-Needs megacmd if you want to save backups on mega.co.nz [megacmd git page](https://github.com/t3rm1n4l/megacmd/) and a mega account, of course [mega.co.nz](https://mega.co.nz/)
+Needs megacmd if you want to save backups on mega.co.nz [megacmd git page](https://github.com/t3rm1n4l/megacmd/) and a [mega.co.nz](https://mega.co.nz/) account, of course .
 
 
 ## INSTALLATION STEPS:
