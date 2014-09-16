@@ -28,6 +28,9 @@ DAY=`date '+%02d'`
 
 #######################
 ### BACKUP DATABASES
+### if a $ORIGIN/00_databases.txt exists, grab the list of specified databases you want to backup, otherwise get them all
+### 00_databases.txt content is just a list of database names, separated by a space
+### e.g. database1 mywebsite otherdb
 #######################
 cd $ORIGIN
 
@@ -37,9 +40,7 @@ then
 	mkdir 000_database_dumps
 fi
 
-# if a $ORIGIN/00_databases.txt exists, grab the list of specified databases you want to backup, otherwise get them all
-# 00_databases.txt content is just a list of database names, separated by a space
-# e.g. database1 mywebsite otherdb
+# check if we want to backup specified databases, or get them all
 if [ -f 00_databases.txt ]
 then
 	mapfile DATABASES < 00_databases.txt
