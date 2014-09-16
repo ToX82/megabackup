@@ -74,7 +74,7 @@ if [ $DAY = "01" -o $DAY = "15" ]; then
 	# if the backup file was created successfully, keep the last two full backups and remove everything else
 	if [ -f "$FILEBACKUP" ]
 	then
-		ls -td $DESTINATION/Backup-INCR* | xargs rm -f
+		ls -td $DESTINATION/Backup-DIFF* | xargs rm -f
 		ls -td $DESTINATION/Backup-FULL* | tail -n +3 | xargs rm -f
 	fi
 else
@@ -84,7 +84,7 @@ else
 	# I'll restore the original .snar file to have further differential backups based on the last full backup
 	cp $DESTINATION/backup-log.snar $DESTINATION/backup-log.snar.0
 
-	FILEBACKUP=$DESTINATION/Backup-INCR-$DATE.tar.bz2
+	FILEBACKUP=$DESTINATION/Backup-DIFF-$DATE.tar.bz2
 	tar cpfj $FILEBACKUP --exclude-from=$EXCLUDES  --listed-incremental $DESTINATION/backup-log.snar ./
 
 	mv $DESTINATION/backup-log.snar.0 $DESTINATION/backup-log.snar
