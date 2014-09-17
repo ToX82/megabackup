@@ -13,7 +13,6 @@ MAIL='your@mail.com'
 
 ORIGIN='/var/www'
 DESTINATION='/media/Storage/Backups/'
-EXCLUDES='/var/www/excludes'
 
 BACKUP_ON_MEGA=false
 
@@ -62,14 +61,14 @@ done
 ### Full backup every 1st day of month
 ### Differential backup every other day
 ###################
-if [ $DAY = "01" ]; then
+if [ $DAY = "01" ] || ! [ -f $DESTINATION/backup-log.snar ]; then
 	BACKUP_TYPE="Full backup"
 
 	# removing the .snar log tells tar to create a new full backup
 	rm -f $DESTINATION/backup-log.snar
 
 	FILENAME=$DESTINATION/Backup-FULL-$DATE.tar.bz2
-	tar cpfj $FILENAME --exclude-from=$EXCLUDES --listed-incremental $DESTINATION/backup-log.snar ./
+	tar cpfj $FILENAME --listed-incremental $DESTINATION/backup-log.snar ./
 
 	# if the backup file was created successfully
 	# keep the last two full backups, the last 7 diff backups and remove everything else
@@ -86,7 +85,7 @@ else
 	cp $DESTINATION/backup-log.snar $DESTINATION/backup-log.snar.0
 
 	FILENAME=$DESTINATION/Backup-DIFF-$DATE.tar.bz2
-	tar cpfj $FILENAME --exclude-from=$EXCLUDES  --listed-incremental $DESTINATION/backup-log.snar ./
+	tar cpfj $FILENAME --listed-incremental $DESTINATION/backup-log.snar ./
 
 	mv $DESTINATION/backup-log.snar.0 $DESTINATION/backup-log.snar
 fi
