@@ -104,6 +104,7 @@ echo "$BACKUP_TYPE finished in $runtime seconds."
 
 ##########################
 ### SAVE BACKUP ON MEGA
+### and delete local backup file
 ##########################
 if [ $BACKUP_ON_MEGA = true ]; then
 	megacmd -verbose=0 put $FILENAME mega:/Backup/
