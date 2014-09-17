@@ -59,20 +59,21 @@ done
 
 ###################
 ### BACKUP FILES
-### Full backup every 1st and 15st day of month
+### Full backup every 1st day of month
 ### Differential backup every other day
 ###################
-if [ $DAY = "01" -o $DAY = "15" ]; then
+if [ $DAY = "01" ]; then
 	BACKUP_TYPE="Full backup"
 
 	# removing the .snar log tells tar to create a new full backup
 	rm -f $DESTINATION/backup-log.snar
 
-	FILEBACKUP=$DESTINATION/Backup-FULL-$DATE.tar.bz2
-	tar cpfj $FILEBACKUP --exclude-from=$EXCLUDES --listed-incremental $DESTINATION/backup-log.snar ./
+	FILENAME=$DESTINATION/Backup-FULL-$DATE.tar.bz2
+	tar cpfj $FILENAME --exclude-from=$EXCLUDES --listed-incremental $DESTINATION/backup-log.snar ./
 
-	# if the backup file was created successfully, keep the last two full backups and remove everything else
-	if [ -f "$FILEBACKUP" ]
+	# if the backup file was created successfully
+	# keep the last two full backups, the last 7 diff backups and remove everything else
+	if [ -f "$FILENAME" ]
 	then
 		ls -td $DESTINATION/Backup-DIFF* | tail -n +8 | xargs rm -f
 		ls -td $DESTINATION/Backup-FULL* | tail -n +3 | xargs rm -f
@@ -81,11 +82,11 @@ else
 	BACKUP_TYPE="Differential backup"
 
 	# I'm saving a copy of backup-log.snar because we want a differential backup and not incremental
-	# I'll restore the original .snar file to have further differential backups based on the last full backup
+	# I'll restore it later to have further differential backups based on the last full backup
 	cp $DESTINATION/backup-log.snar $DESTINATION/backup-log.snar.0
 
-	FILEBACKUP=$DESTINATION/Backup-DIFF-$DATE.tar.bz2
-	tar cpfj $FILEBACKUP --exclude-from=$EXCLUDES  --listed-incremental $DESTINATION/backup-log.snar ./
+	FILENAME=$DESTINATION/Backup-DIFF-$DATE.tar.bz2
+	tar cpfj $FILENAME --exclude-from=$EXCLUDES  --listed-incremental $DESTINATION/backup-log.snar ./
 
 	mv $DESTINATION/backup-log.snar.0 $DESTINATION/backup-log.snar
 fi
@@ -105,6 +106,6 @@ echo "$BACKUP_TYPE finished in $runtime seconds."
 ### SAVE BACKUP ON MEGA
 ##########################
 if [ $BACKUP_ON_MEGA = true ]; then
-	megacmd -verbose=0 put $FILEBACKUP mega:/Backup/
-	rm $FILEBACKUP
+	megacmd -verbose=0 put $FILENAME mega:/Backup/
+	rm $FILENAME
 fi
