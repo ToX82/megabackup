@@ -13,8 +13,8 @@ Needs megacl if you want to save backups on mega.co.nz [megacl git page](https:/
 * edit the configuration settings as your needs
 
 ### OPTIONAL
-* install and configure megacl (run just need to run $ mcl login --email=dave@example.com )
-* enable BACKUP_ON_MEGA setting
+* install and configure megacl (configuration is just a matter of running "mcl login --email=dave@example.com" )
+* set BACKUP_ON_MEGA = true
 
 ## Contributing
 
