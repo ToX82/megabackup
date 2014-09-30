@@ -3,8 +3,11 @@ timer_start=`date +%s`
 
 # ORIGINAL IDEA
 # http://forum.ubuntu-it.org/viewtopic.php?p=3284474#p3284474
-# NEEDS MEGACMD FROM
-# https://github.com/t3rm1n4l/megacmd/
+
+# NEEDS MEGACL FROM
+# https://pypi.python.org/pypi/megacl
+# - you need to log in first! - $ mcl login --email=dave@example.com
+
 
 ####################
 ### CONFIGURATION
@@ -106,6 +109,19 @@ echo "$BACKUP_TYPE finished in $runtime seconds."
 ### and delete local backup file
 ##########################
 if [ $BACKUP_ON_MEGA = true ]; then
-	megacmd -verbose=0 put $FILENAME mega:/Backup/
+	# Check if a Backup directory exist first
+	DIRECTORY=`mcl find -f Backup`
+	EXIST=${#DIRECTORY}
+
+	# If a directory named Backup doesn't exist, let mcl create it
+	if [ $EXIST = 0 ]; then
+		mcl mkdir Backup '/Cloud Drive'
+		mcl reload
+	fi
+
+	# upload...
+	mcl put $FILENAME '/Cloud Drive/Backup'
+
+	# ...and remove local file
 	rm $FILENAME
 fi
