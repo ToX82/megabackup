@@ -37,14 +37,12 @@ DAY=`date '+%02d'`
 cd $ORIGIN
 
 # create a temporary directory for database backups if needed
-if ! [ -d "000_database_dumps" ]
-then
+if ! [ -d "000_database_dumps" ]; then
 	mkdir 000_database_dumps
 fi
 
 # check if we want to backup specified databases, or get them all
-if [ -f 00_databases.txt ]
-then
+if [ -f 00_databases.txt ]; then
 	mapfile DATABASES < 00_databases.txt
 else
 	DATABASES=`mysql --user="$DB_USER" --password="$DB_PASS" -e "SHOW DATABASES;" | grep -Ev "(Database|test|phpmyadmin|mysql|performance_schema|information_schema)"`
@@ -75,8 +73,7 @@ if [ $DAY = "01" ] || ! [ -f $DESTINATION/backup-log.snar ]; then
 
 	# if the backup file was created successfully
 	# keep the last two full backups, the last 7 diff backups and remove everything else
-	if [ -f "$FILENAME" ]
-	then
+	if [ -f "$FILENAME" ]; then
 		ls -td $DESTINATION/Backup-DIFF* | tail -n +8 | xargs rm -f
 		ls -td $DESTINATION/Backup-FULL* | tail -n +3 | xargs rm -f
 	fi
