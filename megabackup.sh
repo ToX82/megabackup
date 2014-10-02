@@ -22,6 +22,10 @@ BACKUP_ON_MEGA=false
 DB_USER='root'
 DB_PASS=''
 
+
+####################
+### TODAY'S DATE
+####################
 DATE=`date '+%Y-%02m-%02d_%02k.%M'`
 DAY=`date '+%02d'`
 
@@ -30,29 +34,44 @@ DAY=`date '+%02d'`
 
 #######################
 ### BACKUP DATABASES
-### if a $ORIGIN/00_databases.txt exists, grab the list of specified databases you want to backup, otherwise get them all
-### 00_databases.txt content is just a list of database names, separated by a space
-### e.g. database1 mywebsite otherdb
+### if a $DESTINATION/00_databases.txt exists, grab the list of specified databases you want to backup, otherwise get them all
+### 00_databases.txt content is just a line separated list of database names, e.g. 
+###
+### database1
+### mywebsite
+### otherdb
 #######################
-cd $ORIGIN
+cd $DESTINATION
 
 # create a temporary directory for database backups if needed
-if ! [ -d "000_database_dumps" ]; then
-	mkdir 000_database_dumps
+if ! [ -d "database_dumps" ]; then
+	mkdir database_dumps
 fi
 
-# check if we want to backup specified databases, or get them all
 if [ -f 00_databases.txt ]; then
-	mapfile DATABASES < 00_databases.txt
+	# backup only specified databases
+	DATABASES=( `cat "00_databases.txt" `)
+
+	for (( i = 0 ; i < ${#DATABASES[@]} ; i++ )) do
+		db=${DATABASES[$i]}
+		mysqldump --force --opt --user="$DB_USER" --password="$DB_PASS" --databases $db > database_dumps/$db.sql
+	done
 else
+	# backup all databases
 	DATABASES=`mysql --user="$DB_USER" --password="$DB_PASS" -e "SHOW DATABASES;" | grep -Ev "(Database|test|phpmyadmin|mysql|performance_schema|information_schema)"`
+
+	for db in $DATABASES; do
+		mysqldump --force --opt --user="$DB_USER" --password="$DB_PASS" --databases $db > database_dumps/$db.sql
+	done
 fi
 
-# let's do the backup
-for db in $DATABASES; do
-	mysqldump --force --opt --user="$DB_USER" --password="$DB_PASS" --databases $db > "000_database_dumps/$db.sql"
-done
 
+# create a compressed archive for databases
+DBFILENAME=Backup-Databases-$DATE.tar.bz2
+tar cpfj $DBFILENAME database_dumps 
+
+# remove the database dump's temporary directory
+rm -rf database_dumps
 
 
 
@@ -62,6 +81,7 @@ done
 ### Full backup every 1st day of month
 ### Differential backup every other day
 ###################
+cd $ORIGIN
 if [ $DAY = "01" ] || ! [ -f $DESTINATION/backup-log.snar ]; then
 	BACKUP_TYPE="Full backup"
 
@@ -69,7 +89,7 @@ if [ $DAY = "01" ] || ! [ -f $DESTINATION/backup-log.snar ]; then
 	rm -f $DESTINATION/backup-log.snar
 
 	FILENAME=$DESTINATION/Backup-FULL-$DATE.tar.bz2
-	tar cpfj $FILENAME --listed-incremental $DESTINATION/backup-log.snar ./
+	tar cpfj $FILENAME --ignore-failed-read --listed-incremental $DESTINATION/backup-log.snar ./
 
 	# if the backup file was created successfully
 	# keep the last two full backups, the last 7 diff backups and remove everything else
@@ -85,13 +105,10 @@ else
 	cp $DESTINATION/backup-log.snar $DESTINATION/backup-log.snar.0
 
 	FILENAME=$DESTINATION/Backup-DIFF-$DATE.tar.bz2
-	tar cpfj $FILENAME --listed-incremental $DESTINATION/backup-log.snar ./
+	tar cpfj $FILENAME --ignore-failed-read --listed-incremental $DESTINATION/backup-log.snar ./
 
 	mv $DESTINATION/backup-log.snar.0 $DESTINATION/backup-log.snar
 fi
-
-# remove the database dump's temporary directory
-rm -rf 000_database_dumps
 
 timer_end=`date +%s`
 runtime=$((timer_end-timer_start))
@@ -113,12 +130,14 @@ if [ $BACKUP_ON_MEGA = true ]; then
 	# If a directory named Backup doesn't exist, let mcl create it
 	if [ $EXIST = 0 ]; then
 		mcl mkdir Backup '/Cloud Drive'
-		mcl reload
 	fi
+	mcl reload
 
 	# upload...
 	mcl put $FILENAME '/Cloud Drive/Backup'
+	mcl put $DESTINATION/$DBFILENAME '/Cloud Drive/Backup'
 
 	# ...and remove local file
 	rm $FILENAME
+	rm $DESTINATION/$DBFILENAME
 fi
