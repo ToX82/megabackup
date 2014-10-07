@@ -124,20 +124,27 @@ echo "$BACKUP_TYPE finished in $runtime seconds."
 ##########################
 if [ $BACKUP_ON_MEGA = true ]; then
 	# Check if a Backup directory exist first
-	DIRECTORY=`mcl find -f Backup`
+	DIRECTORY=`/usr/local/bin/mcl find --reload -f Backup`
 	EXIST=${#DIRECTORY}
 
 	# If a directory named Backup doesn't exist, let mcl create it
 	if [ $EXIST = 0 ]; then
-		mcl mkdir Backup '/Cloud Drive'
+		/usr/local/bin/mcl mkdir Backup '/Cloud Drive'
 	fi
-	mcl reload
 
 	# upload...
-	mcl put $FILENAME '/Cloud Drive/Backup'
-	mcl put $DESTINATION/$DBFILENAME '/Cloud Drive/Backup'
+	/usr/local/bin/mcl put --reload $FILENAME '/Cloud Drive/Backup'
+	/usr/local/bin/mcl put --reload $DESTINATION/$DBFILENAME '/Cloud Drive/Backup'
 
-	# ...and remove local file
-	rm $FILENAME
-	rm $DESTINATION/$DBFILENAME
+	# if upload went successfull remove local files
+	UPLOADED=`/usr/local/bin/mcl find --reload -f $DBFILENAME `
+	EXIST=${#UPLOADED}
+	if [ $EXIST = 0 ]; then
+		# files not uploaded. Leave files alone and send an alert email
+		mailx -s "Problema con il salvataggio dei backup su Mega. Per favore, verifica" < /dev/null $MAIL
+	else
+		# all good. Remove local file
+		rm $FILENAME
+		rm $DESTINATION/$DBFILENAME
+	fi
 fi
