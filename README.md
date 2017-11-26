@@ -5,7 +5,7 @@ A simple BASH script useful to backup mySQL databases and files.
 
 Based upon an idea found here: [Ubuntu-it forum](http://forum.ubuntu-it.org/viewtopic.php?p=3284474#p3284474).
 
-Needs megacl if you want to save backups on mega.co.nz [megacl git page](https://github.com/gissehel/megacl) and a [mega.co.nz](https://mega.co.nz/) account, of course .
+Needs MEGAcmd if you want to save backups on mega.nz [MEGAcmd](https://mega.nz/cmd) and a [mega.co.nz](https://mega.nz/) account, of course .
 
 
 ## INSTALLATION STEPS:
@@ -13,7 +13,7 @@ Needs megacl if you want to save backups on mega.co.nz [megacl git page](https:/
 * edit the configuration settings as your needs
 
 ### OPTIONAL
-* install and configure megacl (configuration is just a matter of running "mcl login --email=dave@example.com" )
+* install and configure MEGAcmd ()
 * set BACKUP_ON_MEGA = true
 
 ## Contributing
