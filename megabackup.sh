@@ -4,9 +4,12 @@ timer_start=`date +%s`
 # ORIGINAL IDEA
 # http://forum.ubuntu-it.org/viewtopic.php?p=3284474#p3284474
 
-# NEEDS MEGACL FROM
-# https://pypi.python.org/pypi/megacl
-# - you need to log in first! - $ mcl login --email=dave@example.com
+# NEEDS MEGACMD FROM
+# https://mega.nz/cmd
+# - you need to log in first!
+# - $ mega-cmd
+# - $ login dave@example.com
+# - $ exit
 
 
 ####################
@@ -123,21 +126,12 @@ echo "$BACKUP_TYPE finished in $runtime seconds."
 ### and delete local backup file
 ##########################
 if [ $BACKUP_ON_MEGA = true ]; then
-	# Check if a Backup directory exist first
-	DIRECTORY=`/usr/local/bin/mcl find --reload -f Backup`
-	EXIST=${#DIRECTORY}
-
-	# If a directory named Backup doesn't exist, let mcl create it
-	if [ $EXIST = 0 ]; then
-		/usr/local/bin/mcl mkdir Backup '/Cloud Drive'
-	fi
-
 	# upload...
-	/usr/local/bin/mcl put --reload $FILENAME '/Cloud Drive/Backup'
-	/usr/local/bin/mcl put --reload $DESTINATION/$DBFILENAME '/Cloud Drive/Backup'
+	mega-put -c $FILENAME '/Backup'
+	mega-put -c $DESTINATION/$DBFILENAME '/Backup'
 
 	# if upload went successfull remove local files
-	UPLOADED=`/usr/local/bin/mcl find --reload -f $DBFILENAME `
+	UPLOADED=`mega-find /Backup/$DBFILENAME `
 	EXIST=${#UPLOADED}
 	if [ $EXIST = 0 ]; then
 		# files not uploaded. Leave files alone and send an alert email
